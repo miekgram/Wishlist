@@ -25,6 +25,7 @@ class Wishlist{
 + void addWish(User user)
 + void removeWish(User user)
 + void editOrder(User user)
++ void reserve(User user)
 }
 class Wish{
 - String nameOfItem
