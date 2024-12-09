@@ -20,40 +20,25 @@ public void startmenu(){
 
 }
     public void login(){
-        /*ArrayList<String> users = new ArrayList<>();
-        HashMap<String,String> usernamePasswordMap = new HashMap<>();
-        users = fileIO.readData(this.userDataPath);
-        for (int i = 0; i < users.size(); i++) {
-            String[] values = users.get(i).split(",");
-            String username = (values[0].trim());
-            String password = (values[1].trim());
-            usernamePasswordMap.put(username,password);
-            System.out.println(username);
-        }
-
-        String userName = textUI.promptText("-----\nTo login, write the username of the wanted user: ");
-        if (usernamePasswordMap.containsKey(userName)) {
-            String password = textUI.promptText("Write your password: ");
-            if (usernamePasswordMap.containsValue(password)) {
-                this.currentUser = new User(userName, password);
-                textUI.displayMsg("Welcome back " + currentUser.userName + "!");
-                mainmenu.displayMainMenu(this.currentUser);
-            } else {
-                textUI.displayMsg("Wrong password, start over login");
-                login();
+    /*
+    brugeren input = textUI.promptText
+     String sql = "SELECT * FROM User"; //Skal være wishes
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                String username = rs.getString("name")); //Kolonnenavn "name"
+                hvis username er lige med (=) equalsTo(input),
+                så skal brugeren skrive password (hvis fejl, prøv igen)
+                String password = rs.getString("password")); //Kolonnenavn "password"
+                hvis password er lige med (=) equalsTo(input), (hvis fejl, prøv igen)
+                så kaldes homemenu
             }
-        }else {
-            textUI.displayMsg("Username doesn't match, let's try again");
-            setupUsers();
+
+        } catch (SQLException e) {
+            e.getMessage();
         }
-    }
-    public User getCurrentUser() {
-        return this.currentUser;
-    }
-
-    //Homemenu kaldes tilsidst
-
-}*/
+     */
     }
     public void registerUser(){
        // String userName = textUI.promptText("Write a username: ");
