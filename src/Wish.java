@@ -5,6 +5,7 @@ public class Wish {
     String category;
     String URL;
 
+
     public Wish(String nameOfItem, String description, float price, String category, String URL) {
         this.nameOfItem = nameOfItem;
         this.description = description;

@@ -1,3 +1,7 @@
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -5,9 +9,14 @@ import java.util.HashMap;
 public class Wishlistplatform {
 private User user;
 private TextUI textUI;
+private Statement stmt;
+private Connection conn;
 
 public void startmenu(){
     // textUI.displayMsg("velkommen til ønskeskyen");
+    //Kaldes via switchcase:
+    //login()
+    //register user
 
 }
     public void login(){
@@ -42,6 +51,7 @@ public void startmenu(){
         return this.currentUser;
     }
 
+    //Homemenu kaldes tilsidst
 
 }*/
     }
@@ -52,6 +62,7 @@ public void startmenu(){
         //this.currentUser = new User(userName, password);
         //fileIO.saveData(this.userDataPath,userName, password);
 
+        //Homemenu kaldes
     }
     public void homemenu (){
     //have en textui.displayhomemenu
@@ -81,12 +92,43 @@ public void startmenu(){
     public void createWishlist(){
     //textui.displaymsg "name your wishlist"
         //String wishlistName = textUI.getStringInput();
+        String name = textUI.promptText("Name your new wishlist: ");
+        String event = textUI.promptText("What is it for? (Christmas, Birthday, Wedding...?):");
+        String sql = "INSERT INTO Wishlists (Name, Event)";
+        sql += "VALUES ("+name+", "+event+");";
+
+//        String createWishlist = "CREATE TABLE " + name +"""(      Dette bruges hvis man opretter en ny tabel ved hver wishlist
+//                         nameOfProducts TEXT,
+//                         prices INTEGER,
+//                         shops TEXT,
+//                         descriptions TEXT,
+//                         links TEXT);""";
+
+        try {
+            stmt = conn.createStatement();
+            stmt.executeQuery(sql);
+            //  stmt.executeQuery(createWishlist);
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
 
     }
-    public void seeWishlist(){
-        //textUI.displayList(user.wishlist,"Here is your wishlist: " );
-       // displaystartmenu();
+    public void viewWishlist(){
+        //TODO: Vi skal have en metode, hvor de kan vælge hvilken ønskeliste de vil se, her
 
+
+        String sql = "SELECT * FROM Wishes"; //Skal være wishes
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                textUI.displayMsg(rs.getString("itemName")); //Skal være title
+            }
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
     }
 
     public void inspiration(){
@@ -119,8 +161,13 @@ public void startmenu(){
 
     }
     public void reserve(){
+    //Tjek om produkt er reserveret, hvis ikke så skal databasens reserveret-kolonne ændres til true
+    //boolean (true/false)
 
     }
 
-}
+    public void removeReservation(){
+        //Tjek om produkt er reserveret, hvis det er, så skal databasens reserveret-kolonne ændres til false
+    }
 
+}
