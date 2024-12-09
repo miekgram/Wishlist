@@ -8,16 +8,27 @@ import java.util.HashMap;
 
 public class Wishlistplatform {
 private User user;
-private TextUI textUI;
+private TextUI textUI = new TextUI();
 private Statement stmt;
 private Connection conn;
 
 public void startmenu(){
-    // textUI.displayMsg("velkommen til ønskeskyen");
+    textUI.displayMsg("Velkommen til ønskeskyen");
+    String choice = textUI.promptText("""
+            What would you like to do?
+            Login (type l)
+            Register new user (type r)
+            """);
     //Kaldes via switchcase:
     //login()
     //register user
 
+    switch(choice){
+        case "l" : login(); break;
+        case "r" : registerUser(); break;
+        default : textUI.displayMsg("Wrong input, please try again");
+            startmenu(); break;
+    }
 }
     public void login(){
     /*
@@ -41,11 +52,25 @@ public void startmenu(){
      */
     }
     public void registerUser(){
-       // String userName = textUI.promptText("Write a username: ");
-       // String password = textUI.promptText("Write a password: ");
+        String userName = textUI.promptText("Write a username: ");
+        String password = textUI.promptText("Write a password: ");
+        String name = textUI.promptText("Please write your name:");
+        int age = Integer.parseInt(textUI.promptText("Please enter your age:"));
+        String email = textUI.promptText("Please enter your email: ");
+        textUI.displayMsg("Fantastic, you are now ready to make wishes!");
 
-        //this.currentUser = new User(userName, password);
-        //fileIO.saveData(this.userDataPath,userName, password);
+        //Tilføjer det som brugeren taster ind til databasen (user-table)
+        String sql = "INSERT INTO User (username, password, name, age, email) VALUES";
+        sql += "('"+userName+"', '"+password+"', '"+name+"', "+age+", '"+ email+"');";
+        try{
+            stmt = conn.createStatement();
+            stmt.executeQuery(sql);
+
+        } catch (SQLException e) {
+            e.getSQLState();
+        }
+        user = new User(userName, password, name, age, email);
+
 
         //Homemenu kaldes
     }
