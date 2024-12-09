@@ -12,7 +12,12 @@ private TextUI textUI = new TextUI();
 private Statement stmt;
 private Connection conn;
 
-public void startmenu(){
+    public Wishlistplatform(Connection conn) {
+        this.conn = conn;
+
+    }
+
+    public void startmenu(){
     textUI.displayMsg("Velkommen til ønskeskyen");
     String choice = textUI.promptText("""
             What would you like to do?
@@ -61,7 +66,7 @@ public void startmenu(){
 
         //Tilføjer det som brugeren taster ind til databasen (user-table)
         String sql = "INSERT INTO User (username, password, name, age, email) VALUES";
-        sql += "('"+userName+"', '"+password+"', '"+name+"', "+age+", '"+ email+"');";
+        sql += "('"+userName+"', '"+password+"', '"+name+"', "+age+", '"+email+"');";
         try{
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
@@ -70,7 +75,7 @@ public void startmenu(){
             e.getSQLState();
         }
         user = new User(userName, password, name, age, email);
-
+        System.out.println("A new user was created: "+user.toString());
 
         //Homemenu kaldes
     }

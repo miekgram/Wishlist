@@ -12,4 +12,15 @@ public class User {
         this.age = age;
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+               "username='" + username + '\'' +
+               ", password='" + password + '\'' +
+               ", name='" + name + '\'' +
+               ", age=" + age +
+               ", email='" + email + '\'' +
+               '}';
+    }
 }
