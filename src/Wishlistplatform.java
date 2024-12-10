@@ -36,6 +36,53 @@ private Connection conn;
     }
 }
     public void login(){
+
+            typeUsername();
+        }
+
+
+        public void typeUsername(){
+            String usernameInput = textUI.promptText("Please type your username: ");  //Bruger taster sit brugernavn
+            String sql = "SELECT * FROM User";
+            int row = 0;
+            try {
+                stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+                while(rs.next()) {
+                    row++;
+                    String username = rs.getString("username");               //Henter username kolonnen ind, række efter række
+                    if (username.equals(usernameInput)) {
+                        typePassword(row);
+                    }
+                }
+            } catch(SQLException e) {
+                e.getMessage();
+            }
+        }
+
+        public void typePassword(int targetrow){
+            String passwordInput = textUI.promptText("Please type your password: "); //Bruger taster sit password
+            String sql = "SELECT * FROM User";
+            int row = 0;
+            try {
+                stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+                while(rs.next()) {
+                    row++;
+                    if (row == targetrow){
+                        String password = rs.getString("password");                 //Henter password kolonnen ind fra den række som username også er fundet på
+                        if(password.equals(passwordInput)){                                    //Tjekker om brugeren input matcher noget i password-kolonnen
+                            homemenu();
+                        } else {
+                            textUI.displayMsg("Wrong input, try again. Type your password: ");
+                            typePassword(targetrow);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                e.getMessage();
+            }
+        }
     /*
     brugeren input = textUI.promptText
      String sql = "SELECT * FROM User"; //Skal være wishes
@@ -55,7 +102,7 @@ private Connection conn;
             e.getMessage();
         }
      */
-    }
+
     public void registerUser(){
         String userName = textUI.promptText("Write a username: ");
         String password = textUI.promptText("Write a password: ");
@@ -77,32 +124,31 @@ private Connection conn;
         user = new User(userName, password, name, age, email);
         System.out.println("A new user was created: "+user.toString());
 
-        //Homemenu kaldes
+        homemenu();
     }
     public void homemenu (){
-    //have en textui.displayhomemenu
-        //lave et switch case hvor man knumerisk kan se forskellige nedenstående muligheder
-        //fx
-       /* int choice = textUI.promptNumeric( """
+        textUI.displayMsg("You are now in homemenu!");
+
+       int choice = textUI.promptNumeric( """
                 Please choose an option:
                 1. create wishlist
-                2. see wishlist
+                2. view wishlist
                 3. inspiration
                 4. see other wishlist
                 """);
         switch (choice){
-            case 1 : createWishlist(user, " "); break;
-            case 2 : seeWishlist(user); break;
-            case 3 : inspiration(user);break;
-            case 4 : seeOtherWishlists(user);break;
+            case 1 : createWishlist(); break;
+            case 2 : viewWishlist(); break;
+            case 3 : inspiration();break;
+            case 4 : seeOtherWishlists();break;
             case 5 : {
                 textUI.displayMsg("leaving homemenu");
-                startmenu = new Startmenu();
+
 
             }
             default : textUI.displayMsg("invalid choice, try again");
-
-        }*/
+                startmenu();
+        }
     }
     public void createWishlist(){
     //textui.displaymsg "name your wishlist"
@@ -130,6 +176,9 @@ private Connection conn;
 
     }
     public void viewWishlist(){
+        textUI.displayMsg("here is all your wishlist's");
+
+
         //TODO: Vi skal have en metode, hvor de kan vælge hvilken ønskeliste de vil se, her
 
 
@@ -144,44 +193,62 @@ private Connection conn;
         } catch (SQLException e) {
             e.getMessage();
         }
+        homemenu();
     }
 
     public void inspiration(){
-    /* String choice = textUI.prompttext( """
+        textUI.displayMsg("You are now in inspiration!");
+    int choice = textUI.promptNumeric( """
                 Please choose an option:
-                1. bolig
-                2. personligpleje
-                3. mode
-                4. børn
-                5. hobby
+                1. Bolig
+                2. Personligpleje
+                3. Mode
+                4. Børn
+                5. Hobby
                 """);
         switch (choice){
-            case 1 : database
-            case 2 : database
-            case 3 : database
-            case 4 : database
-            case 5 : database{
+            case 1 : break;
+            case 2 : break;
+            case 3 : break;
+            case 4 : break;
+            case 5 : {
                 textUI.displayMsg("leaving homemenu");
-                startmenu = new homemenu();
+
 
             }
             default : textUI.displayMsg("invalid choice, try again");
-
-        }*/
+                homemenu();
+        }
     }
     public void seeOtherWishlists() {
-        //textUI.displayList(user.wishlist,"Here is others wishlist, would you like to reserve a wish: " );
+        textUI.displayMsg("Here is others wishlist" );
+        String choice = textUI.promptText("""
+            What would you like to do?
+            reserve a wish (type y)
+            remove reservation (type r)
+            """);
 
-        // reserve();
+
+        switch(choice){
+            case "y" : reserve(); break;
+            case "r" : removeReservation(); break;
+            default : textUI.displayMsg("Wrong input, please try again");
+                homemenu();
+        }
+
+
 
     }
     public void reserve(){
+        textUI.displayMsg("You have reserved this wish!");
+
     //Tjek om produkt er reserveret, hvis ikke så skal databasens reserveret-kolonne ændres til true
     //boolean (true/false)
 
     }
 
     public void removeReservation(){
+        textUI.displayMsg("You have removed your reservation from this wish!");
         //Tjek om produkt er reserveret, hvis det er, så skal databasens reserveret-kolonne ændres til false
     }
 
