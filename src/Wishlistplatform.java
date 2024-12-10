@@ -200,10 +200,10 @@ private Connection conn;
         textUI.displayMsg("You are now in inspiration!");
     int choice = textUI.promptNumeric( """
                 Please choose an option:
-                1. Bolig
-                2. Personligpleje
-                3. Mode
-                4. Børn
+                1. Household
+                2. Personalcare
+                3. Fashion
+                4. Children
                 5. Hobby
                 """);
         switch (choice){
