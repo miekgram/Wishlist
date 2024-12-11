@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class Wishlist {
     User user;
-    TextUI textUI;
+    TextUI textUI = new TextUI();
     Statement stmt;
     Connection conn;
     String name;
@@ -20,4 +20,5 @@ public class Wishlist {
         this.event = event;*/
 
     }
+}
 

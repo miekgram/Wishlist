@@ -12,10 +12,10 @@ public class TextUI {
 
     public boolean promptBinary(String msg){
         String input = promptText(msg);
-        if(input.equalsIgnoreCase("Login")){
+        if(input.equalsIgnoreCase("n")){
             return false;
         }
-        else if(input.equalsIgnoreCase("Create user")){
+        else if(input.equalsIgnoreCase("y")){
             return true;
         }
         displayMsg("You typed a wrong input, try again");

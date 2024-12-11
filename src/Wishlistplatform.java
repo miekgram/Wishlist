@@ -2,8 +2,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class Wishlistplatform extends Category {
@@ -11,7 +9,7 @@ public class Wishlistplatform extends Category {
     private TextUI textUI = new TextUI();
     private Statement stmt;
     private Connection conn;
-    //private ArrayList<Wishlist> whishlistList = new ArrayList();
+    //private ArrayList<Wishlist> wishlistList = new ArrayList();
     private Wishlist wishlist = new Wishlist();
 
     public Wishlistplatform(Connection conn) {
@@ -20,93 +18,88 @@ public class Wishlistplatform extends Category {
     }
 
 
-    public void startmenu(){
-    textUI.displayMsg("Velkommen til ønskeskyen");
-    String choice = textUI.promptText("""
-            What would you like to do?
-            Login (type l)
-            Register new user (type r)
-            """);
-    //Kaldes via switchcase:
-    //login()
-    //register user
+    public void startmenu() {
+        textUI.displayMsg("Velkommen til ønskeskyen");
+        String choice = textUI.promptText("""
+                What would you like to do?
+                Login (type l)
+                Register new user (type r)
+                """);
+        //Kaldes via switchcase:
+        //login()
+        //register user
 
-    switch(choice){
-        case "l" : login(); break;
-        case "r" : registerUser(); break;
-        default : textUI.displayMsg("Wrong input, please try again");
-            startmenu(); break;
+        switch (choice) {
+            case "l":
+                login();
+                break;
+            case "r":
+                registerUser();
+                break;
+            default:
+                textUI.displayMsg("Wrong input, please try again");
+                startmenu();
+                break;
+        }
     }
-}
-    public void login(){
 
-            typeUsername();
-        }
+    public void login() {
+        typeUsername();
+    }
 
 
-        public void typeUsername(){
-            String usernameInput = textUI.promptText("Please type your username: ");  //Bruger taster sit brugernavn
-            String sql = "SELECT * FROM User";
-            int row = 0;
-            try {
-                stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-                while(rs.next()) {
-                    row++;
-                    String username = rs.getString("username");               //Henter username kolonnen ind, række efter række
-                    if (username.equals(usernameInput)) {
-                        typePassword(row);
-                    }
-                }
-            } catch(SQLException e) {
-                e.getMessage();
-            }
-        }
-
-        public void typePassword(int targetrow){
-            String passwordInput = textUI.promptText("Please type your password: "); //Bruger taster sit password
-            String sql = "SELECT * FROM User";
-            int row = 0;
-            try {
-                stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-                while(rs.next()) {
-                    row++;
-                    if (row == targetrow){
-                        String password = rs.getString("password");                 //Henter password kolonnen ind fra den række som username også er fundet på
-                        if(password.equals(passwordInput)){                                    //Tjekker om brugeren input matcher noget i password-kolonnen
-                            homemenu();
-                        } else {
-                            textUI.displayMsg("Wrong input, try again. Type your password: ");
-                            typePassword(targetrow);
-                        }
-                    }
-                }
-            } catch (SQLException e) {
-                e.getMessage();
-            }
-        }
-    /*
-    brugeren input = textUI.promptText
-     String sql = "SELECT * FROM User"; //Skal være wishes
+    public void typeUsername() {
+        String usernameInput = textUI.promptText("Please type your username: ");  //Bruger taster sit brugernavn
+        String sql = "SELECT * FROM User";
+        int row = 0;
         try {
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next()){
-                String username = rs.getString("name")); //Kolonnenavn "name"
-                hvis username er lige med (=) equalsTo(input),
-                så skal brugeren skrive password (hvis fejl, prøv igen)
-                String password = rs.getString("password")); //Kolonnenavn "password"
-                hvis password er lige med (=) equalsTo(input), (hvis fejl, prøv igen)
-                så kaldes homemenu
+            while (rs.next()) {
+                row++;
+                String username = rs.getString("username");               //Henter username kolonnen ind, række efter række
+                if (username.equals(usernameInput)) {
+                    typePassword(row);
+                }
             }
-
         } catch (SQLException e) {
             e.getMessage();
         }
-     */
+    }
 
-    public void registerUser(){
+    public void typePassword(int targetrow) {
+        String passwordInput = textUI.promptText("Please type your password: "); //Bruger taster sit password
+        String sql = "SELECT * FROM User";
+        int row = 0;
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                row++;
+                if (row == targetrow) {
+                    String username = rs.getString("username");
+                    String password = rs.getString("password");                 //Henter password kolonnen ind fra den række som username også er fundet på
+                    String name = rs.getString("name");
+                    int age = rs.getInt("age");
+                    int userID = rs.getInt("UserID");
+                    String email = rs.getString("email");                //Henter password kolonnen ind fra den række som username også er fundet på
+                    if (password.equals(passwordInput)) {
+                        this.currentUser = new User(username, password, name, age, userID, email);//Tjekker om brugeren input matcher noget i password-kolonnen
+                        homemenu();
+                    } else {
+                        textUI.displayMsg("Wrong input, try again. Type your password: ");
+                        typePassword(targetrow);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+    }
+
+
+
+    public void registerUser() {
         String userName = textUI.promptText("Write a username: ");
         String password = textUI.promptText("Write a password: ");
         String name = textUI.promptText("Please write your name:");
@@ -116,23 +109,40 @@ public class Wishlistplatform extends Category {
 
         //Tilføjer det som brugeren taster ind til databasen (user-table)
         String sql = "INSERT INTO User (username, password, name, age, email) VALUES";
-        sql += "('"+userName+"', '"+password+"', '"+name+"', "+age+", '"+email+"');";
-        try{
+        sql += "('" + userName + "', '" + password + "', '" + name + "', " + age + ", '" + email + "');";
+
+        try {
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
 
         } catch (SQLException e) {
             e.getSQLState();
         }
-        user = new User(userName, password, name, age, email);
-        System.out.println("A new user was created: "+user.toString());
 
-        homemenu();
+        String getUserID = "SELECT * FROM User";
+        int userID = 0;
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(getUserID);
+            while (rs.next()) {
+                String username = rs.getString("username");
+                if (userName.equals(username)) {
+                    userID = rs.getInt("UserID");
+                }
+                currentUser = new User(userName, password, name, age, userID, email);
+                //System.out.println("A new user was created: "+currentUser.toString());
+                homemenu();
+
+            }
+        } catch (SQLException e) {
+            e.getMessage();
+        }
     }
-    public void homemenu (){
+
+    public void homemenu() {
         textUI.displayMsg("You are now in homemenu!");
 
-       int choice = textUI.promptNumeric( """
+        int choice = textUI.promptNumeric("""
                 Please choose an option:
                 1. create wishlist
                 2. view wishlist
@@ -157,13 +167,13 @@ public class Wishlistplatform extends Category {
 
 
             }
-            default : textUI.displayMsg("invalid choice, try again");
+            default:
+                textUI.displayMsg("invalid choice, try again");
                 startmenu();
         }
     }
-    public void createWishlist(){
-    //textui.displaymsg "name your wishlist"
-        //String wishlistName = textUI.getStringInput();
+
+    public void createWishlist() {
         String name = textUI.promptText("Name your new wishlist: ");
         String event = textUI.promptText("What is it for? (Christmas, Birthday, Wedding...?):");
         String sql = "INSERT INTO Wishlists (title, ownerID, event) VALUES ";
@@ -218,7 +228,7 @@ public class Wishlistplatform extends Category {
 
     }
 
-    public void inspiration(){
+    public void inspiration() {
         textUI.displayMsg("You are now in inspiration!");
         String sql = "";
         int choice = textUI.promptNumeric("""
@@ -247,8 +257,6 @@ public class Wishlistplatform extends Category {
                 break;
             case 6: {
                 textUI.displayMsg("leaving homemenu");
-
-
             }
 
             default:
@@ -257,8 +265,9 @@ public class Wishlistplatform extends Category {
         }
         homemenu();
     }
+
     public void seeOtherWishlists() {
-        textUI.displayMsg("Here is others wishlist" );
+        textUI.displayMsg("Here is others wishlist");
         String choice = textUI.promptText("""
                 What would you like to do?
                 reserve a wish (type y)
@@ -266,30 +275,31 @@ public class Wishlistplatform extends Category {
                 """);
         switch (choice) {
             case "y":
-                wishlist.reserve();
+                reserve();
                 break;
             case "r":
-                wishlist.removeReservation();
+                removeReservation();
                 break;
             default:
                 textUI.displayMsg("Wrong input, please try again");
                 homemenu();
         }
-
-
-
     }
+
     public void editWishlist(int wishlistID) {
 
-        int choice = textUI.promptNumeric( """
+        int choice = textUI.promptNumeric("""
                 Please choose an option:
                 1. Add wish
                 2. Remove wish
                 3. Edit order of wishes""");
-        switch(choice){
-            case 1: addWish(wishlistID);
-            case 2: removeWish(wishlistID);
-            case 3: editOrder();
+        switch (choice) {
+            case 1:
+                addWish(wishlistID);
+            case 2:
+                removeWish(wishlistID);
+            case 3:
+                editOrder();
         }
 
 
@@ -315,8 +325,8 @@ public class Wishlistplatform extends Category {
 
         //Tilføjer info til wishes
         String sql = "INSERT INTO wishes (nameOfProducts, prices, store, descriptions, links, Categories, WishlistID,reservated) VALUES";
-        sql += "('"+nameOfProduct+"', "+price+", '"+store+"', '"+description+"', '"+ link+"', '"+category +"', "+ wishlistID+", '"+ reserved+"');";
-        try{
+        sql += "('" + nameOfProduct + "', " + price + ", '" + store + "', '" + description + "', '" + link + "', '" + category + "', " + wishlistID + ", '" + reserved + "');";
+        try {
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
         } catch (SQLException e) {
@@ -346,7 +356,8 @@ public class Wishlistplatform extends Category {
     public void editOrder() {
 
     }
-    public void reserve(){
+
+    public void reserve() {
         textUI.displayMsg("You have reserved this wish!");
 
         //Tjek om produkt er reserveret, hvis ikke så skal databasens reserveret-kolonne ændres til true
@@ -354,7 +365,7 @@ public class Wishlistplatform extends Category {
 
     }
 
-    public void removeReservation(){
+    public void removeReservation() {
         textUI.displayMsg("You have removed your reservation from this wish!");
         //Tjek om produkt er reserveret, hvis det er, så skal databasens reserveret-kolonne ændres til false
     }
@@ -363,4 +374,5 @@ public class Wishlistplatform extends Category {
 
 
 
-}
+
+
