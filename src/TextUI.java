@@ -66,5 +66,17 @@ public class TextUI {
         }
         System.out.println("*******\n");
     }
+    public void displayListOfWishes(ArrayList<Wish> wishes, String msg){
+        System.out.println("*******");
+        System.out.println(msg);
+        System.out.println("*******");
+
+
+        for (Wish w : wishes) {
+            displayMsg("- "+w); //andre attributer kan tilføjes, hvis ønsket
+
+        }
+        System.out.println("*******\n");
+    }
 
 }

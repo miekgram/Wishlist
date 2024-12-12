@@ -6,8 +6,10 @@ public class Main {
     public static void main(String[] args) {
         Connection con = null;
 
+
         try {
             con = DriverManager.getConnection("jdbc:sqlite:/Users/miegram/Documents/ICE/Wishlist/data/Database");
+            con.setAutoCommit(true);
         }
         catch (SQLException e) {
 

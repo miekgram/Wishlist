@@ -14,6 +14,12 @@ public class Wish {
         this.URL = URL;
     }
 
+    @Override
+    public String toString() {
+        return nameOfItem +", "+ price+",- , "+ description+", "+ URL;
+
+    }
+
     public String getNameOfItem() {
         return nameOfItem;
     }
