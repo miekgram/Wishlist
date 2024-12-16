@@ -10,13 +10,11 @@ public class Wishlistplatform {
     private TextUI textUI = new TextUI();
     private Statement stmt;
     private Connection conn;
-    //private ArrayList<Wishlist> wishlistList = new ArrayList();
-    private Wishlist wishlist = new Wishlist();
+    //private Wishlist wishlist = new Wishlist();
 
 
     public Wishlistplatform(Connection conn) {
         this.conn = conn;
-
     }
 
 
@@ -81,7 +79,7 @@ public class Wishlistplatform {
                     String name = rs.getString("name");
                     int age = rs.getInt("age");
                     int userID = rs.getInt("UserID");
-                    String email = rs.getString("email");                //Henter password kolonnen ind fra den række som username også er fundet på
+                    String email = rs.getString("email");                       //Henter password kolonnen ind fra den række som username også er fundet på
                     if (password.equals(passwordInput)) {
                         this.currentUser = new User(username, password, name, age, userID, email);//Tjekker om brugeren input matcher noget i password-kolonnen
                         homemenu();
@@ -188,9 +186,10 @@ public class Wishlistplatform {
         textUI.displayMsg("Here are all your wishlist's");
         String sql = "SELECT * FROM Wishlists WHERE ownerID = " + currentUser.getUserID() + ";";
         ResultSet rs = getResultSetBySQL(sql);
-        displayWishlists(sql); //Viser alle brugeren egne ønskelister
+        displayWishlists(sql);                      //Viser alle brugerens egne ønskelister
         int choice = textUI.promptNumeric("Please type the ID of the wishlist you want to see: ");
-        //Brugeren vælger wishlistID de vil se //Kunne være fedt, hvis man valgte det ud fra noget andet end ID
+
+            //Brugeren vælger wishlistID de vil se //Kunne være fedt, hvis man valgte det ud fra noget andet end ID
         String getWishes = "SELECT * FROM Wishes WHERE WishlistID = "+ choice;
         getWishesFromWishlist(getWishes);
 
@@ -234,7 +233,7 @@ public class Wishlistplatform {
                 break;
         }
         String sql = "SELECT * FROM Wishes WHERE categories ='" + category + "';";
-        ArrayList<Wish> wishes = getWishesFromWishlist(sql);
+        ArrayList<Wish> wishes = getWishesFromWishlist(sql);        //Henter wishes med brugerens valg af kategori
         textUI.displayListOfWishes(wishes, "Here is the list of " + category + " inspiration");
         homemenu();
     }
@@ -246,7 +245,7 @@ public class Wishlistplatform {
 
         int wishListId = textUI.promptNumeric("Please type the ID of the wishlist you want to see: ");
         String getWishes = "SELECT * FROM Wishes WHERE WishlistID = " + wishListId;
-        ArrayList<Wish> listOfWishes = getWishesFromWishlist(sql);
+        ArrayList<Wish> listOfWishes = getWishesFromWishlist(getWishes);
         textUI.displayListOfWishes(listOfWishes, "Here is all the wishes from the chosen wishlist");
 
 

@@ -1,0 +1,81 @@
+@startuml
+'https://plantuml.com/class-diagram
+!pragma layout smetana
+
+class Wishlistplatform {
+- User currentuser
+- TextUI TextUI
+- Statement stmt
+- Connection conn
++ void startmenu()
++ void login()
++ void registerUser()
++ void typePassword()
++ void homemenu()
++ void createWishlist()
++ void viewWishlist()
++ void inspiration()
++ void seeOtherWishlists()
++ void reserve()
++ void editOrder()
++ void reserveWishInDb()
++ void removeReservation()
++ void removeReservationInDb()
++ void SQLExecuteQuery()
++ ResultSet getResultSetBySQL()
++ void getWishesFromWishlist(String sql)
++ void removeWish()
++ void addWish()
++ void editWishList()
++ void viewOtherWishlist()
++ void displayWishList
+}
+class User{
+-String userName
+-String password
+-String name
+-int age
+-int userID
+-String email
++ int getUserID
+}
+
+class Wishlist{
+- User user
+- TextUI textUI
+- Statement stmt
+- String name
+- String event
+
+}
+class Wish{
+- String nameOfItem
+- String description
+- float price
+- String category
+- String URL
+- boolean isResevated
+}
+class TextUI{
+-Scanner scanner
++ void displayMsg(String s)
++ int promptNumeric(String msg)
++ String promptText(String msg)
++ int promptChoice(String msg, ArrayList<String> list)
++ boolean promptBinary(String msg )
++ void displayListOfWishes()
+}
+class Database{
+}
+
+Wishlistplatform *-- User
+Wishlistplatform *-- TextUI
+User *-- Wishlist
+Wishlist *-- Wish
+
+
+
+
+}
+
+@enduml
