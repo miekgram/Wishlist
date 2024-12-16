@@ -5,7 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 
-public class Wishlistplatform extends Category {
+public class Wishlistplatform {
     private User currentUser;
     private TextUI textUI = new TextUI();
     private Statement stmt;
@@ -21,15 +21,12 @@ public class Wishlistplatform extends Category {
 
 
     public void startmenu() {
-        textUI.displayMsg("Velkommen til ønskeskyen");
+        textUI.displayMsg("Welcome to Mmm Wishes");
         String choice = textUI.promptText("""
                 What would you like to do?
                 Login (type l)
                 Register new user (type r)
                 """);
-        //Kaldes via switchcase:
-        //login()
-        //register user
 
         switch (choice) {
             case "l":
@@ -100,7 +97,6 @@ public class Wishlistplatform extends Category {
     }
 
 
-
     public void registerUser() {
         String userName = textUI.promptText("Write a username: ");
         String password = textUI.promptText("Write a password: ");
@@ -132,7 +128,7 @@ public class Wishlistplatform extends Category {
                     userID = rs.getInt("UserID");
                 }
                 currentUser = new User(userName, password, name, age, userID, email);
-                //System.out.println("A new user was created: "+currentUser.toString());
+                //System.out.println("A new user was created: "+currentUser.toString()); //Jespers hjælp
                 homemenu();
 
             }
@@ -142,12 +138,12 @@ public class Wishlistplatform extends Category {
     }
 
     public void homemenu() {
-        textUI.displayMsg("You are now in homemenu!");
+        textUI.displayMsg("You are now in your homemenu!");
 
         int choice = textUI.promptNumeric("""
                 Please choose an option:
-                1. create wishlist
-                2. view wishlist
+                1. create a wishlist
+                2. view your wishlist
                 3. inspiration
                 4. see other wishlist
                 """);
@@ -164,14 +160,10 @@ public class Wishlistplatform extends Category {
             case 4:
                 seeOtherWishlists();
                 break;
-            case 5: {
-                textUI.displayMsg("leaving homemenu");
-
-
-            }
             default:
-                textUI.displayMsg("invalid choice, try again");
+                textUI.displayMsg("invalid choice, you are now in startmenu");
                 startmenu();
+                break;
         }
     }
 
@@ -184,8 +176,6 @@ public class Wishlistplatform extends Category {
         try {
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
-            //  stmt.executeQuery(createWishlist);
-
         } catch (SQLException e) {
             e.getMessage();
         }
@@ -195,38 +185,21 @@ public class Wishlistplatform extends Category {
 
     public void viewWishlist() {
 
-            textUI.displayMsg("Here are all your wishlist's");
-            String sql = "SELECT * FROM Wishlists WHERE ownerID = " + currentUser.getUserID() + ";";
-            ResultSet rs = getResultSetBySQL(sql);
-            try {
-                while (rs.next()) {
-                    String title = rs.getString("title");
-                    int wishlistID = rs.getInt("WishlistID");
-                    textUI.displayMsg(" - " + title + ", ID: " + wishlistID);
-                }
-            } catch (SQLException e) {
-                e.getMessage();
-            }
-            int choice = textUI.promptNumeric("Please type the ID of the wishlist you want to see: ");
-            //TODO: Vi skal have en metode, hvor de kan vælge hvilken ønskeliste de vil se, her
+        textUI.displayMsg("Here are all your wishlist's");
+        String sql = "SELECT * FROM Wishlists WHERE ownerID = " + currentUser.getUserID() + ";";
+        ResultSet rs = getResultSetBySQL(sql);
+        displayWishlists(sql); //Viser alle brugeren egne ønskelister
+        int choice = textUI.promptNumeric("Please type the ID of the wishlist you want to see: ");
+        //Brugeren vælger wishlistID de vil se //Kunne være fedt, hvis man valgte det ud fra noget andet end ID
+        String getWishes = "SELECT * FROM Wishes WHERE WishlistID = "+ choice;
+        getWishesFromWishlist(getWishes);
 
-            try {
-                String wishes = "SELECT * FROM Wishes WHERE WishlistID = " + choice; //TODO: = id af brugerens valgte ønskeliste
-                stmt = conn.createStatement();
-                ResultSet wishesRS = stmt.executeQuery(wishes);
-                while (wishesRS.next()) {
-                    textUI.displayMsg(wishesRS.getString("item"));
-                }
-
-            } catch (SQLException e) {
-                e.getMessage();
-            }
-            boolean edit = textUI.promptBinary("Would you like to edit this wishlist? y/n");
-            if (edit == true) {
-                editWishlist(choice);
-            } else {
-                homemenu();
-            }
+        boolean edit = textUI.promptBinary("Would you like to edit in this wishlist? y/n");
+        if (edit == true) {
+            editWishlist(choice);
+        } else {
+            homemenu();
+        }
     }
 
     public void inspiration() {
@@ -241,52 +214,64 @@ public class Wishlistplatform extends Category {
                 5. Hobby
                 """);
         switch (choice) {
-            case 1: category = "Household"; break;
-            case 2: category = "Personalcare"; break;
-            case 3: category = "Fashion";break;
-            case 4: category = "Children"; break;
-            case 5: category = "Hobby"; break;
-            default: textUI.displayMsg("invalid choice, try again"); break;
+            case 1:
+                category = "Household";
+                break;
+            case 2:
+                category = "Personalcare";
+                break;
+            case 3:
+                category = "Fashion";
+                break;
+            case 4:
+                category = "Children";
+                break;
+            case 5:
+                category = "Hobby";
+                break;
+            default:
+                textUI.displayMsg("invalid choice, try again");
+                break;
         }
-        String sql = "SELECT * FROM Wishes WHERE categories ='"+category+ "';";
-        ArrayList<Wish> wishes = new ArrayList<>();
-        try {
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                    String item = rs.getString("item");
-                    String description = rs.getString("description");
-                    int price = rs.getInt("prices");
-                    String url = rs.getString("links");
-                    Wish wish = new Wish(item,description,price,category,url);
-                    wishes.add(wish);
-                }
-        } catch (SQLException e) {
-            e.getMessage();
-        }
-        textUI.displayListOfWishes(wishes, "Here is the list of " +category+ " inspiration");
+        String sql = "SELECT * FROM Wishes WHERE categories ='" + category + "';";
+        ArrayList<Wish> wishes = getWishesFromWishlist(sql);
+        textUI.displayListOfWishes(wishes, "Here is the list of " + category + " inspiration");
         homemenu();
     }
 
     public void seeOtherWishlists() {
         textUI.displayMsg("Here is others wishlist");
+        String sql = "SELECT * FROM Wishlists WHERE NOT ownerID = " + currentUser.getUserID() + ";";
+        displayWishlists(sql);  //displayer alle ønskelister, der ikke har samme ownerID som den pågældende bruger
+
+        int wishListId = textUI.promptNumeric("Please type the ID of the wishlist you want to see: ");
+        String getWishes = "SELECT * FROM Wishes WHERE WishlistID = " + wishListId;
+        ArrayList<Wish> listOfWishes = getWishesFromWishlist(sql);
+        textUI.displayListOfWishes(listOfWishes, "Here is all the wishes from the chosen wishlist");
+
+
         String choice = textUI.promptText("""
                 What would you like to do?
-                reserve a wish (type y)
-                remove reservation (type r)
+                Reserve a wish (type y)
+                Remove a reservation (type r)
+                Go back to homemenu(type h)
                 """);
         switch (choice) {
             case "y":
-                reserve();
+                reserve(listOfWishes, wishListId);
                 break;
             case "r":
-                removeReservation();
+                removeReservation(listOfWishes, wishListId);
+                break;
+            case "h":
+                homemenu();
                 break;
             default:
                 textUI.displayMsg("Wrong input, please try again");
-                homemenu();
+                seeOtherWishlists();
         }
     }
+
 
     public void editWishlist(int wishlistID) {
 
@@ -303,21 +288,11 @@ public class Wishlistplatform extends Category {
             case 3:
                 editOrder();
         }
-
-
     }
 
 
     public void addWish(int wishlistID) {
-       /* if(!user.wishlist.contains(wish.getnameOfItem())){
-            user.wishlist.add(wish.getnameOfItem());
-            textUI.displayMsg(wish.getnameOfItem() + " has been added to your list.\n");
-
-        }else{
-            textUI.displayMsg(wish.getnameOfItem() + " is already in your list.\n");
-
-    }*/
-        String nameOfProduct = textUI.promptText("Type name of product: ");
+        String nameOfProduct = textUI.promptText("Type the name of the product: ");
         int price = Integer.parseInt(textUI.promptText("Type the price of the product:"));
         String store = textUI.promptText("In what store can u buy this product? ");
         String description = textUI.promptText("Description (size, color, etc.?): ");
@@ -326,82 +301,135 @@ public class Wishlistplatform extends Category {
         boolean reserved = false;
 
         //Tilføjer info til wishes
-        //String sql = "INSERT INTO Wishes (nameOfProducts, prices, store, descriptions, links, Categories, WishlistID,reservated) VALUES";
         String sql = "INSERT INTO Wishes (item, prices, store, description, links, categories, WishlistID, reservated) VALUES";
         sql += "('" + nameOfProduct + "', " + price + ", '" + store + "', '" + description + "', '" + link + "', '" + category + "', " + wishlistID + ", '" + reserved + "');";
         String succes = "Wish added successfully!";
         String error = "Wish was not added to wishlist";
-        SQLExecuteQuery(sql,succes,error);
+        SQLExecuteQuery(sql, succes, error);
         homemenu();
     }
 
     public void removeWish(int wishlistID) {
-
         String deleteWish = textUI.promptText("Write the exact name of the product you want to delete from your wishlist: ");
-        String sql = "DELETE FROM Wishes WHERE item='"+deleteWish+"';";
+        String sql = "DELETE FROM Wishes WHERE item='" + deleteWish + "';";
         String succes = "Wish removed successfully!";
         String error = "Wish was not removed from your wishlist";
-        SQLExecuteQuery(sql,succes,error);
-        /*try {
-            stmt = conn.createStatement();
-            //stmt.executeQuery(sql);
-            stmt.executeUpdate(sql);
-            textUI.displayMsg("Wish removed successfully!");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            textUI.displayMsg("Failed to remove the wish: " + e.getMessage());
-            e.getSQLState();
-        }*/
+        SQLExecuteQuery(sql, succes, error);
         homemenu();
     }
 
 
     public void editOrder() {
-
+        textUI.displayMsg("Not avaiable yet:)");
+        homemenu();
     }
 
-    public void reserve() {
-        textUI.displayMsg("You have reserved this wish!");
+    public void reserve(ArrayList<Wish> listOfWishes, int wishListId) {
 
-        //Tjek om produkt er reserveret, hvis ikke så skal databasens reserveret-kolonne ændres til true
-        //boolean (true/false)
+        textUI.displayMsg("Here is a list of all the wishes:");
 
+        for (Wish wish : listOfWishes) {
+            textUI.displayMsg(wish + " - Reservated: " + wish.getIsReservated()); //Printer wish toString og reserveret: true/false
+        }
+        String choice = textUI.promptText("choose a wish to reserve");
+        reserveWishInDb(choice);
+        textUI.displayMsg("You have reserved this wish! and will now be returning to homemenu");
+        homemenu();
     }
 
-    public void removeReservation() {
-        textUI.displayMsg("You have removed your reservation from this wish!");
-        //Tjek om produkt er reserveret, hvis det er, så skal databasens reserveret-kolonne ændres til false
-    }
-
-    public void SQLExecuteQuery(String SQLQuery,String succes,String errorMsg){
-        try{
-            String sql = SQLQuery;
-            stmt = conn.createStatement();
-            textUI.displayMsg(succes);
-            stmt.executeQuery(sql);
-        }catch(SQLException e){
-            textUI.displayMsg(errorMsg);
+    public void reserveWishInDb(String choice) {
+        try {
+            String sql = "UPDATE Wishes SET reservated = true WHERE item = '" + choice + "'";
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
             e.getMessage();
         }
     }
 
-    public ResultSet getResultSetBySQL(String SQLQuery){
-        ResultSet rs = null;
+    public void removeReservation(ArrayList<Wish> listOfWishes, int wishListId) {
+        textUI.displayMsg("Here is a list of all the wishes:");
+
+        for (Wish wish : listOfWishes) {
+            textUI.displayMsg(wish + " - Reservated: " + wish.getIsReservated()); //Printer wish toString og reserveret: true/false
+        }
+        String removeChoice = textUI.promptText("choose a wish to remove your reservation from");
+        removeReservationInDb(removeChoice);
+        textUI.displayMsg("You have removed your reservation! and will now be returning to homemenu");
+        homemenu();
+    }
+
+    public void removeReservationInDb(String removeChoice) {
         try {
-            String sql = SQLQuery;
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
+            String sql = "UPDATE Wishes SET reservated = false WHERE item = '" + removeChoice + "'";
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(sql);
 
         } catch (SQLException e) {
             e.getMessage();
         }
-        return rs;
     }
 
-}
+    public void displayWishlists(String sql) {
+        ResultSet rs = getResultSetBySQL(sql);
+        try {
+            while (rs.next()) {
+                String title = rs.getString("title");
+                int wishlistID = rs.getInt("WishlistID");
+                textUI.displayMsg("- " + title + ", ID: " + wishlistID);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
 
 
+    public ArrayList<Wish> getWishesFromWishlist(String sql) {
+        ArrayList<Wish> wishesFromWishlistID = new ArrayList<>();
+
+            ResultSet rs = getResultSetBySQL(sql);
+            try {
+                while (rs.next()) {
+                    String item = rs.getString("item");
+                    String description = rs.getString("description");
+                    int price = rs.getInt("prices");
+                    String category = rs.getString("categories");
+                    String url = rs.getString("links");
+                    boolean isReserved = rs.getBoolean("reservated");
+                    Wish wish = new Wish(item, description, price, category, url, isReserved);
+                    wishesFromWishlistID.add(wish);
+                    System.out.println(wish);
+                }
+            } catch (SQLException e) {
+                e.getMessage();
+            }
+            return wishesFromWishlistID;
+    }
 
 
+        public void SQLExecuteQuery (String SQLQuery, String succes, String errorMsg){
+            try {
+                String sql = SQLQuery;
+                stmt = conn.createStatement();
+                textUI.displayMsg(succes);
+                stmt.executeQuery(sql);
+            } catch (SQLException e) {
+                textUI.displayMsg(errorMsg);
+                e.getMessage();
+            }
+        }
 
+        public ResultSet getResultSetBySQL (String SQLQuery){
+            ResultSet rs = null;
+            try {
+                String sql = SQLQuery;
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sql);
 
+            } catch (SQLException e) {
+                e.getMessage();
+            }
+            return rs;
+        }
+
+    }
